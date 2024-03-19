@@ -5,10 +5,10 @@
 #include <../libexter/include/md5.h>
 
 
-#include "sys/types.h"//数据类型定义
-#include "sys/socket.h" //提供socket函数及数据结构
-#include "netinet/in.h" //定义数据结构sockaddr_in
-#include "arpa/inet.h" //供IP地址转换函数
+#include "sys/types.h"//�唳蝐餃�摰�
+#include "sys/socket.h" //��socket�賣��桃���
+#include "netinet/in.h" //摰��唳蝏�sockaddr_in
+#include "arpa/inet.h" //靘P�啣�頧祆�賣
 #include "unistd.h"
 
 
@@ -47,8 +47,8 @@ const char * RESPONSE_401 = "HTTP/1.1 401 Unauthorized\r\n"
 
 
 //=======================================================
-//用户链表
-//创建链表头
+//�冽�曇”
+//�遣�曇”憭�
 http_user_t *user_list_create(void)
 {
     http_user_t *head = (http_user_t *)pool_malloc(sizeof(http_user_t));
@@ -57,7 +57,7 @@ http_user_t *user_list_create(void)
     head->next = NULL;
     return head;
 }
-//末尾添加节点
+//�怠偏瘛餃��
 http_user_t *user_list_add_node(http_user_t *head)
 {
     if(head == NULL)
@@ -72,7 +72,7 @@ http_user_t *user_list_add_node(http_user_t *head)
     prob->next = node;
     return node;
 }
-//删除节点
+//��
 void user_list_del_node(http_user_t *head, http_user_t *node)
 {
     if(head == NULL || node == NULL)
@@ -91,7 +91,7 @@ void user_list_del_node(http_user_t *head, http_user_t *node)
         prob = prob->next;
     }
 }
-//统计个数
+//蝏恣銝芣
 int user_list_get_num(http_user_t *head)
 {
     if(head == NULL)
@@ -105,7 +105,7 @@ int user_list_get_num(http_user_t *head)
     }
     return cnt;
 }
-//清空链表
+//皜征�曇”
 void user_list_clear(http_user_t *head)
 {   
     if(head == NULL)
@@ -127,7 +127,7 @@ void user_list_clear(http_user_t *head)
     }
 }
 
-//显示
+//�曄內
 void user_list_show(http_user_t *head)
 {
     LOG_SHOW("================user list show===================\n");
@@ -150,7 +150,7 @@ void user_list_show(http_user_t *head)
     }
     LOG_SHOW("\n");
 }
-//测试
+//瘚�
 void user_list_test(void)
 {
     http_user_t *head = user_list_create();
@@ -175,7 +175,7 @@ void user_list_test(void)
     user_list_clear(head);
     user_list_show(head);
 }
-//应用
+//摨
 int user_list_del_timeout(http_user_t *head, int second)
 {
     if(head == NULL || second <= 0)
@@ -186,7 +186,7 @@ int user_list_del_timeout(http_user_t *head, int second)
     http_user_t *last = head;
     while(prob != NULL)
     {
-        now = time(NULL);   //可能时间无法获取，这里没考虑  
+        now = time(NULL);   //�航�園���瑕�嚗��瓷��  
         if(now - prob->freshTime > second)
         {     
             //LOG_DEBUG("========>second=%d\n", second);
@@ -203,7 +203,7 @@ int user_list_del_timeout(http_user_t *head, int second)
     return num;
 }
 
-//user 对象创建
+//user 撖寡情�遣
 http_user_t *user_obj_create()
 {
     http_user_t *user = (http_user_t *)pool_malloc(sizeof(http_user_t));
@@ -216,18 +216,18 @@ http_user_t *user_obj_create()
     return user;
 }
 
-//user 对象的释放
+//user 撖寡情����
 void user_obj_free(http_user_t *user)
 {
     if(user == NULL)
         return;
-    //关闭socket
+    //�喲socket
     close(user->fd);
         
-    //线程退出
+    //蝥輻����
     pthread_cancel(user->thRecv);
     
-    //释放内存
+    //���
     if(user->recv.head != NULL)
         buf_list_free(user->recv.head);
     if(user->request.payload != NULL && user->request.payloadCreateMark == 1)
@@ -238,24 +238,24 @@ void user_obj_free(http_user_t *user)
     LOG_INFO("user fd=%d has been free", user->fd);
 }
 
-//user 对象的初始化
+//user 撖寡情��憪�
 void user_obj_init(http_user_t *user)
 {
     if(user == NULL)
         return;
     cfg_t *cfg = get_locl_cfg_manager();
     
-    //1、请求的基础配置
+    //1�窈瘙��箇��蔭
     http_request_t *req = &(user->request);
-    //1.1 用户名和密码
+    //1.1 �冽��撖�
     strncpy(req->userName, cfg->iniCfg.username, 64);
     strncpy(req->password, cfg->iniCfg.password, 64);
-    //1.2 请求头部信息
+    //1.2 霂瑟�憭湧靽⊥
     strncpy(req->head.host, cfg->iniCfg.host, 64);
     req->head.port = atoi(cfg->iniCfg.port);
     strncpy(req->head.uri, cfg->iniCfg.uri, 128);
     strncpy(req->head.userAgent, cfg->iniCfg.userAgent, 64);
-    //1.3 认证信息
+    //1.3 霈方�靽⊥
     strncpy(req->auth.realm, cfg->iniCfg.auth.realm, 32);
     strncpy(req->auth.nonce, cfg->iniCfg.auth.nonce, 32);
     strncpy(req->auth.cnonce, cfg->iniCfg.auth.cnonce, 32);
@@ -268,7 +268,7 @@ void user_obj_init(http_user_t *user)
 
 
 
-//http 头部解析
+//http 憭湧閫��
 //"%s %s HTTP/1.1\r\n"
 //        "Host: %s:%d\r\n"
 //        "User-Agent: %s\r\n"
@@ -293,12 +293,12 @@ char realm[32];
 */
 
 #if 0
-HTTP请求头（HTTP Request 
-Headers）是HTTP请求消息的一部分，它包含了关于发送请求到服务器的附加信息。请求头字段
-以冒号（:）分隔，字段名和字段值之间有一个空格，多个请求头之间用换行符（\r\
-n）分隔。
+HTTP霂瑟�憭湛�HTTP Request 
+Headers嚗HTTP霂瑟�瘨���典�嚗��鈭鈭��窈瘙��函���靽⊥�窈瘙仍摮挾
+隞亙��瘀�:嚗���摮挾��摮挾�潔��湔�銝銝芰征�潘�憭葵霂瑟�憭港��渡�Ｚ�蝚佗�\r\
+n嚗���
 
-一个典型的HTTP请求头可能看起来像这样：
+銝銝芸��HTTP霂瑟�憭游�賜�韏瑟���瘀�
 
 http
 GET /index.html HTTP/1.1  
@@ -311,24 +311,24 @@ Accept-Language: en-US,en;q=0.8
 Cookie: name=value; anothername=anothervalue  
 Connection: keep-alive
 
-在这个例子中：
+�刻�銝芯�摮葉嚗�
 
-    GET /index.html HTTP/1.1 是请求行，它包含请求方法（GET）、请求的资源路径（/index.
-html）和HTTP协议的版本（HTTP/1.1）。
-    Host: www.example.com 表示请求的目标主机名。
-    User-Agent 字段包含了关于发起请求的客户端的信息。
-    Accept 字段表示客户端能够处理的媒体类型。
-    Accept-Encoding 字段表示客户端支持的内容编码类型。
-    Accept-Language 字段表示客户端接受的自然语言。
-    Cookie 字段包含了与请求相关的cookie信息。
+    GET /index.html HTTP/1.1 �航窈瘙�嚗��霂瑟��寞�嚗ET嚗窈瘙�韏�頝臬�嚗�/index.
+html嚗�HTTP�悅���穿�HTTP/1.1嚗�
+    Host: www.example.com 銵函內霂瑟���蜓�箏���
+    User-Agent 摮挾�鈭鈭�韏瑁窈瘙�摰Ｘ蝡舐�靽⊥��
+    Accept 摮挾銵函內摰Ｘ蝡航憭���慦�蝐餃���
+    Accept-Encoding 摮挾銵函內摰Ｘ蝡舀���捆蝻�蝐餃���
+    Accept-Language 摮挾銵函內摰Ｘ蝡舀���芰霂剛���
+    Cookie 摮挾�鈭�霂瑟��詨�ookie靽⊥��
     Connection: keep-alive 
-表示客户端希望保持与服务器的连接，以便后续请求可以复用同一连接。
+銵函內摰Ｘ蝡臬�������函�餈嚗誑靘踹�蝏剛窈瘙隞亙��典�銝餈��
 
-请注意，不是所有的请求头字段都是必需的，而且根据具体的请求和场景，可以包含其他�
-�段或省略某些字段。
+霂瑟釣��銝���霂瑟�憭游�畾菟�臬�������寞�瑚��窈瘙��箸嚗隞亙��怠隞�
+挾���交�鈭�畾萸�
 
-当您编写HTTP客户端或服务器时，确保遵守HTTP协议规范，并且正确处理请求头字段。不同的
-浏览器、客户端库和服务器可能具有不同的默认请求头，但它们都应该遵循HTTP标准。
+敶蝻�HTTP摰Ｘ蝡舀���冽嚗＆靽摰TTP�悅閫�嚗僎銝迤蝖桀��窈瘙仍摮挾����
+瘚��具恥�瑞垢摨���典�賢����暺恕霂瑟�憭湛�雿�隞祇摨砲�萄儐HTTP����
 #endif
 
 int http_head_parse(http_user_t *user)
@@ -353,7 +353,7 @@ int http_head_parse(http_user_t *user)
     parse->lenOk = 0;
     parse->authMark = 0;
     
-    //查看第一行是否符合条件
+    //�亦�蝚砌�銵�衣泵�隞�
     buf_truple_t *firstLine;
     firstLine = buf_list_get_node(doc, 0);
     if(!((strpro_str_contain(firstLine->data, HTTP_HEAD_FIRST_LINE_VALID_MARK_1) == 1 ||
@@ -363,7 +363,7 @@ int http_head_parse(http_user_t *user)
         return RET_CODE_PROCESS;
     }
     
-    //第一行解析
+    //蝚砌�銵圾��
     char *words[3] = {0};
     char strTmp[128];
     strncpy(strTmp, firstLine->data, 128);
@@ -379,9 +379,9 @@ int http_head_parse(http_user_t *user)
     parse->methodOk = 1;
     strncpy(parse->uri, words[1], 128);
     parse->uriOk = 1;
-    //观察http头部结构特点发现，每一行字符串可以根据 "," 或者 ";" 分隔成子串，每个子串可以通过
-    // ":" 或者 "=" 分隔为 键值对，最终得到键值对的数组
-    //注： http头部第一行内容不符合这里的规律，所以要单独解析
+    //閫�http憭湧蝏��寧�嚗�銝銵�蝚虫葡�臭誑�寞 "," �� ";" ����銝莎�瘥葵摮葡�臭誑��
+    // ":" �� "=" ��銝� �桀澆笆嚗�蝏��圈�澆笆�蝏�
+    //瘜剁� http憭湧蝚砌�銵�摰嫣�蝚血�餈���敺��隞亥��閫��
     int i, num, keyValCnt, ret;
     key_value_t keyValArray[HTTP_HEAD_KEY_VAL_MAX_NUM] = {0};
     char out[HTTP_HEAD_KEY_VAL_MAX_NUM][HTTP_HEAD_KEY_VAL_MAX_BYTE];
@@ -401,7 +401,7 @@ int http_head_parse(http_user_t *user)
             {
                 if(key_value_get_from_str(":=", 2, outp[i],&kvTmp))
                 {
-                    //去掉key 和 value 两边的无效字符" "、"\r"、"\n"
+                    //�餅�key �� value 銝方器����蝚�" "��"\r"��"\n"
                     ret = 0;
                     ret += strpro_get_viald_str(kvTmp.key, kvTmp2.key);
                     ret += strpro_get_viald_str(kvTmp.value, kvTmp2.value);
@@ -415,7 +415,7 @@ int http_head_parse(http_user_t *user)
     }
 
     //key_value_array_show(keyValArray, keyValCnt);
-    //1、得到 “Host"、"User-Agent"、"Content-Length" 对应的值
+    //1���� �ost"��"User-Agent"��"Content-Length" 撖孵���
     char valueTmp[128];
     if(key_value_case_inquire(keyValArray, keyValCnt, "Host", valueTmp, 128))
     {
@@ -433,7 +433,7 @@ int http_head_parse(http_user_t *user)
         if(!(parse->len == 0 && valueTmp[0] != '0'))
             parse->lenOk = 1;        
     }
-    //2、最后一行为"\r\n"，前一行为摘要认证内容，参考rfc2617
+    //2����銵蛹"\r\n"嚗�銝銵蛹��霈方��捆嚗��fc2617
     buf_truple_t *authLine;
     prob = doc;
     authLine = prob;
@@ -449,7 +449,7 @@ int http_head_parse(http_user_t *user)
     }
     
     
-    //3、解析认证内容 username、 realm、 nonce、 cnonce,  qop,  nc,  uri、 response
+    //3�圾�恕霂�摰� username�� realm�� nonce�� cnonce,  qop,  nc,  uri�� response
     if(key_value_case_inquire(keyValArray, keyValCnt, "username", valueTmp, 128))
     { 
         strpro_remove_colon(valueTmp);
@@ -519,8 +519,8 @@ int http_head_parse(http_user_t *user)
 
 
 //================================================================================
-//http接收和发送数据
-//http 读取（非阻塞读取）
+//http�交�����
+//http 霂餃�嚗��餃�霂餃�嚗�
 int http_recv(http_user_t *user, unsigned char *data, int size)
 {
     int len;
@@ -528,7 +528,7 @@ int http_recv(http_user_t *user, unsigned char *data, int size)
 	return len;
 }
 
-//http 读取一行（注意：要保证size大小在数组data的范围之内，不然会有数组溢出错误）
+//http 霂餃�銝銵�瘜冽�嚗�靽�size憭批��冽蝏ata���港���銝隡��啁�皞Ｗ�秤嚗�
 int http_recv_line(http_user_t *user, unsigned char *data, int size)
 {
     unsigned char ch;
@@ -551,10 +551,10 @@ int http_recv_line(http_user_t *user, unsigned char *data, int size)
             return i;
         }
     }
-    return -2;  //表示没有接收到换行符
+    return -2;  //銵函內瘝⊥��交�唳銵泵
 }
 
-//http接收头部
+//http�交憭湧
 #define RECV_HEAD_LINE_MAX_SIZE 1024
 #define HTTP_HEAD_MAX_LINE_NUM 16
 int http_recv_head(http_user_t *user)
@@ -568,11 +568,11 @@ int http_recv_head(http_user_t *user)
     ret = http_recv_line(user, tmp, RECV_HEAD_LINE_MAX_SIZE);
     recvLen = 0; cnt = 0; user->recv.httpHeadRecvOk = 0;
     if(ret == -2)
-        return -3;  //没有接收到http头的标志
+        return -3;  //瘝⊥��交�退ttp憭渡���
     if(ret == -1)
-        return -1;  //无数据
+        return -1;  //���
     if(ret == 0)
-        return 0;   //对方断开连接
+        return 0;   //撖寞�剖�餈
     
     if(strpro_str_contain(tmp, HTTP_HEAD_FIRST_LINE_VALID_MARK_1) == 1 || 
          strpro_str_contain(tmp, HTTP_HEAD_FIRST_LINE_VALID_MARK_2) == 1)
@@ -585,7 +585,7 @@ int http_recv_head(http_user_t *user)
             if(ret == -1)
                 return -1;
             if(ret == -2)
-                return recvLen;          //http头部的某一行字节数超过限定长度
+                return recvLen;          //http憭湧��銝銵��頞����踹漲
             else if(ret == 0)
                 return 0;
             else if(ret > 0)
@@ -613,7 +613,7 @@ int http_recv_head(http_user_t *user)
     return -5;  
 }
 
-//线程：用户的数据接收
+//蝥輻�嚗�瑞��唳�交
 void * http_user_recv_data_thread(void *arg)
 {
     if(arg == NULL)
@@ -624,7 +624,7 @@ void * http_user_recv_data_thread(void *arg)
     http_user_t *user = (http_user_t *)arg;
     http_user_recv_t *recv = &(user->recv);
 
-    //参数检测
+    //�璉瘚�
     if(user->fd < 0)
     {
         LOG_INFO("fd is not ok");
@@ -638,16 +638,16 @@ void * http_user_recv_data_thread(void *arg)
    recv->step = 0;
     while(1)
     {
-        poll(fds, 1, 10000);//超时等待
+        poll(fds, 1, 10000);//頞蝑�
         if((fds[0].revents & POLLIN) && recv->en)
         {
             char buf[1024] = {0};
-            //更新刷新时间
+            //�湔�瑟�園
             user->freshTime = time(NULL);;
             //LOG_DEBUG("poll is comming, fd is %d\n", user->fd);
             switch(recv->step)
             {
-                case 0:     //准备接收头部
+                case 0:     //���交憭湧
                 {
                     buf_list_clear(recv->head);
                     recvRet = http_recv_head(user);
@@ -655,8 +655,8 @@ void * http_user_recv_data_thread(void *arg)
                     {                      
                         LOG_DEBUG("recv http head OK");
                         http_head_parse(user);
-                        //摘要认证
-                        if(recv->headParse.authMark == 0)//没有摘要认证，回复401
+                        //��霈方�
+                        if(recv->headParse.authMark == 0)//瘝⊥���霈方�嚗�憭�401
                         {   
                             ;
                         }
@@ -670,7 +670,7 @@ void * http_user_recv_data_thread(void *arg)
                     }                      
                 }
                 break;
-                case 1:     //准备接收负载
+                case 1:     //���交韐蝸
                 {
                     //LOG_DEBUG("lenOk=%d  len=%d\n", recv->headParse.lenOk, recv->headParse.len);
                     if(recv->headParse.lenOk == 1 && recv->headParse.len > 0)   
@@ -683,7 +683,7 @@ void * http_user_recv_data_thread(void *arg)
                     }                     
                 }
                 break;
-                case 2:     //等待处理
+                case 2:     //蝑�憭�
                 {
                     user->recv_data_pro(user);
                 }
@@ -731,7 +731,7 @@ void * http_user_recv_data_thread(void *arg)
 }
 
 
-//http 发送
+//http ��
 int http_send(http_user_t *user, unsigned char *data, int size)
 {
     int len;
@@ -772,7 +772,7 @@ http_request_t http_request_create(
     return req;
 }
 
-//http发送请求
+//http�窈瘙�
 int http_send_request(http_user_t *user)
 {
     //LOG_SHOW("======================mark 0\n");
@@ -908,7 +908,7 @@ int http_post(http_user_t *user, unsigned char *data, int len)
 
 
 
-//socket 赋值
+//socket 韏�
 void http_socket_set(
     http_socket_t *so,
     int domain,
@@ -929,12 +929,12 @@ void http_socket_set(
 }
 
 
-//socket绑定ip和端口
+//socket蝏�ip�垢��
 int http_socket_bind(http_socket_t *so)
 {
     int ret;
     //LOG_INFO("http_bind is comming.......");
-    //参数检测
+    //�璉瘚�
     if(so == NULL)
         return RET_CODE_PARAM;
     if(so->addrPort < 0 || so->addrPort > 65536)
@@ -943,7 +943,7 @@ int http_socket_bind(http_socket_t *so)
         return RET_CODE_PARAM;
     }
         
-    //创建套接字
+    //�遣憟摮�
 	so->val = socket(so->domain, so->type, so->protocol);
 	if(so->val < 0)
 	{
@@ -955,7 +955,7 @@ int http_socket_bind(http_socket_t *so)
 	addr.sin_addr.s_addr = inet_addr(so->addrIp);
     addr.sin_port = htons(so->addrPort);  
     	
-	//绑定ip和端口号
+	//蝏�ip�垢��
 	ret = bind(so->val, (struct sockaddr *)(&addr), sizeof(struct sockaddr_in));
 	if(ret != 0)
 	{
@@ -971,8 +971,8 @@ faild:
 
 
 //====================================================================
-//服务器操作
-//创建服务器
+//��冽�雿�
+//�遣���
 http_server_t *http_server_create(void)
 {
     http_server_t *server = (http_server_t *)pool_malloc(sizeof(http_server_t));
@@ -984,7 +984,7 @@ http_server_t *http_server_create(void)
     return server;
 }
 
-//服务器开始监听
+//��典�憪���
 int http_server_listen(http_server_t *server)
 {
     if(server == NULL)
@@ -999,8 +999,8 @@ int http_server_listen(http_server_t *server)
 	server->listenMark = 1;
     return RET_CODE_OK;
 }
-//接受用户的连接
-//注：注意指针参数作为输出量，需要传入指针的指针，才能保证得到修改后的值；两次遇到这种错误了......
+//�亙��冽����
+//瘜剁�瘜冽����雿蛹颲���閬��交�����嚗��賭�霂��唬耨�孵��潘�銝斗活�餈��秤鈭�......
 int http_accept_user_connect(http_server_t *server, http_user_t **newUser)
 {   
     unsigned char *ipv4;
@@ -1020,24 +1020,24 @@ int http_accept_user_connect(http_server_t *server, http_user_t **newUser)
         return RET_CODE_PARAM;
     }
 
-     //查看用户个数是否超过限制
+     //�亦��冽銝芣�臬頞��
     if(user_list_get_num(server->userList) >= server->socket.maxUserNum)
     {
         LOG_ERROR("user num is full");
         return RET_CODE_OVERFLOW;
     }
 
-	//接受用户的连接
+	//�亙��冽����
     newid = accept(server->socket.val, (struct sockaddr *)&addr, &len);
     if(newid == -1)
     {
         LOG_ERROR("accept error");
         return RET_CODE_PROCESS;
     } 
-    ipv4 = (unsigned char *)(&(addr.sin_addr.s_addr));  //默认只支持ipv4，有待扩展
+    ipv4 = (unsigned char *)(&(addr.sin_addr.s_addr));  //暺恕�芣�pv4嚗�敺撅�
     LOG_INFO("newid=%d; accept user from ip:%d.%d.%d.%d:%d", newid, ipv4[0], ipv4[1], ipv4[2], ipv4[3], (ntohs(addr.sin_port)));
     
-    //用户信息存入链表
+    //�冽靽⊥摮�曇”
     http_user_t *node = user_list_add_node(server->userList);
     if(node == NULL)
     {
@@ -1057,7 +1057,7 @@ int http_accept_user_connect(http_server_t *server, http_user_t **newUser)
     //LOG_DEBUG("========>newUser=%p node=%p\n", *newUser, node);  
     return RET_CODE_OK;
 }
-//线程：处理用户的连接
+//蝥輻�嚗���瑞�餈
 void * httpd_server_accept_thread(void *arg)
 {
     if(arg == NULL)
@@ -1067,7 +1067,7 @@ void * httpd_server_accept_thread(void *arg)
     } 
     
     http_server_t *server = (http_server_t *)arg;
-    //参数检测
+    //�璉瘚�
     if(server->socket.val < 0)
         return NULL;
    struct pollfd fds[1] = {0};
@@ -1077,7 +1077,7 @@ void * httpd_server_accept_thread(void *arg)
    http_user_t *newUser;
     while(1)
     {
-        poll(fds, 1, 10000);//超时等待
+        poll(fds, 1, 10000);//頞蝑�
         if(fds[0].revents & POLLIN)
         {
             //LOG_INFO("poll is comming");
@@ -1089,7 +1089,7 @@ void * httpd_server_accept_thread(void *arg)
             }
             if(ret == RET_CODE_OK)
             {
-                //开启数据接收线程
+                //撘�舀�格�嗥瑪蝔�
                 //LOG_INFO("thread create is comming......\n");
                 pthread_t th;
                 ret = pthread_create(&th, NULL, http_user_recv_data_thread, (void *)newUser);
@@ -1112,7 +1112,7 @@ void * httpd_server_accept_thread(void *arg)
         }
     }
 }
-//线程：用户连接超时检测
+//蝥輻�嚗�瑁��亥��嗆�瘚�
 void *http_server_timeout_thread(void *arg)
 {
     if(arg == NULL)
@@ -1129,7 +1129,7 @@ void *http_server_timeout_thread(void *arg)
     }
 
 }
-//开启服务器
+//撘�舀��∪
 int http_server_start(http_server_t *server)
 {
     int ret;
@@ -1144,7 +1144,7 @@ int http_server_start(http_server_t *server)
         LOG_SHOW("server socket is not ready");
         return RET_CODE_PARAM;
     }    
-    //socket绑定
+    //socket蝏�
     ret = http_socket_bind(&(server->socket));
     if(ret != RET_CODE_OK)
     {
@@ -1153,7 +1153,7 @@ int http_server_start(http_server_t *server)
         return RET_CODE_PROCESS;
     }
     server->bindMark = 1;
-    //监听
+    //�
     ret = http_server_listen(server);
     if(ret != RET_CODE_OK)
     {
@@ -1163,7 +1163,7 @@ int http_server_start(http_server_t *server)
     }
     server->listenMark = 1;
 
-    //开启线程：接收新的用户
+    //撘�舐瑪蝔��交�啁��冽
     pthread_t thRecv;
     ret = pthread_create(&thRecv, NULL, httpd_server_accept_thread, (void *)server);
     if(ret == -1)
@@ -1178,7 +1178,7 @@ int http_server_start(http_server_t *server)
         server->thRecvMark = 1;
     }
 
-    //开启线程：超时清除用户
+    //撘�舐瑪蝔�頞皜�冽
     pthread_t thTimeout;
     ret = pthread_create(&thTimeout, NULL, http_server_timeout_thread, (void *)server);
      if(ret == -1)
@@ -1199,8 +1199,8 @@ int http_server_start(http_server_t *server)
 
 
 //======================================================================================
-//客户端操作
-//创建客户端
+//摰Ｘ蝡舀�雿�
+//�遣摰Ｘ蝡�
 http_client_t *http_client_create(void)
 {
    http_client_t *client = (http_client_t *)pool_malloc(sizeof(http_client_t));
@@ -1210,7 +1210,7 @@ http_client_t *http_client_create(void)
    return client;
 }
 
-//连接到服务器
+//餈�唳��∪
 int http_client_connect_to_server(http_client_t *client)
 {
     if(client == NULL)
@@ -1227,7 +1227,7 @@ int http_client_connect_to_server(http_client_t *client)
     addr.sin_port = htons(client->destPort);
     len = sizeof(struct sockaddr_in);
     
-    //连接到服务器
+    //餈�唳��∪
 	//LOG_INFO("connect......fd=%d", client->socket.val);
     ret = connect(client->socket.val, (const struct sockaddr *)&addr, len);
     if(ret < 0)
@@ -1242,7 +1242,7 @@ int http_client_connect_to_server(http_client_t *client)
 
 }
 
-//开启客户端
+//撘�臬恥�瑞垢
 int http_client_start(http_client_t *client)
 {
     int ret;
@@ -1251,13 +1251,13 @@ int http_client_start(http_client_t *client)
         LOG_ERROR("client is NULL");
         return RET_CODE_PARAM;
     }
-    //查看socket是否已配置
+    //�亦�socket�臬撌脤�蝵�
     if(client->socketMark == 0)
     {
         LOG_ALARM("socket is not ready");
         return RET_CODE_PROCESS;
     }
-    //socket绑定
+    //socket蝏�
     client->bindMark = 0;
     ret = http_socket_bind(&(client->socket));
     if(ret != RET_CODE_OK)
@@ -1267,7 +1267,7 @@ int http_client_start(http_client_t *client)
     }
     client->user.fd = client->socket.val;
     client->bindMark = 1;
-    //连接服务器
+    //餈���
     client->connectMark = 0;
     ret = http_client_connect_to_server(client);
     if(ret != RET_CODE_OK)
@@ -1279,7 +1279,7 @@ int http_client_start(http_client_t *client)
     client->connectMark = 1;
     client->user->enable = 1;
     client->user.recv_data_pro = client->recv_data_pro;
-    //开启数据接收线程
+    //撘�舀�格�嗥瑪蝔�
     pthread_t th;
     ret = pthread_create(&th, NULL, http_user_recv_data_thread, (void *)(&(client->user)));
     if(ret == -1)
@@ -1298,7 +1298,7 @@ int http_client_start(http_client_t *client)
 }
 //======================================================================================
 
-//摘要认证计算
+//��霈方�霈∠�
 int http_calc_digest_response(char * user, char * pwd,
                             char * realm,
                             char * nonce,
@@ -1322,7 +1322,7 @@ int http_calc_digest_response(char * user, char * pwd,
 }
 
 
-//http 认证结果
+//http 霈方�蝏�
 int http_auth_result(http_digest_auth_t auth, char *username, char *response)
 {
     if(username == NULL || response == NULL)
@@ -1335,7 +1335,7 @@ int http_auth_result(http_digest_auth_t auth, char *username, char *response)
     if(cfg == NULL)
         return 0;
     ret = key_value_inquire(cfg->userCfg.userArray, cfg->userCfg.userNum, username, password, 256);
-    if(ret == 0)    //找到用户密码
+    if(ret == 0)    //�曉�冽撖�
         return 0;
     
     http_calc_digest_response(username, password, auth.realm, auth.nonce,
